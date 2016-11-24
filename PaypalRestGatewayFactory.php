@@ -34,22 +34,24 @@ class PaypalRestGatewayFactory extends GatewayFactory
             $config['payum.default_options'] = [
                 'client_id' => '',
                 'client_secret' => '',
-                'config_path' => '',
+                'mode' => 'sandbox' // or 'live'
             ];
             $config->defaults($config['payum.default_options']);
 
-            $config['payum.required_options'] = ['client_id', 'client_secret', 'config_path'];
+            $config['payum.required_options'] = ['client_id', 'client_secret', 'mode'];
             $config['payum.api'] = function (ArrayObject $config) {
                 $config->validateNotEmpty($config['payum.required_options']);
 
-                if (false == defined('PP_CONFIG_PATH')) {
-                    define('PP_CONFIG_PATH', $config['config_path']);
-                } elseif (PP_CONFIG_PATH !== $config['config_path']) {
-                    throw new InvalidArgumentException(sprintf('Given "config_path" is invalid. Should be equal to the defined "PP_CONFIG_PATH": %s.', PP_CONFIG_PATH));
-                }
-
                 $credential = new OAuthTokenCredential($config['client_id'], $config['client_secret']);
                 \PayPal\Common\PayPalModel::setCredential($credential);
+                $configManager = \PayPal\Core\PayPalConfigManager::getInstance();
+                $iniConfig = [
+                    'http.ConnectionTimeOut' => 30,
+                    'http.Retry' => 1,
+                    'mode' => $config['sandbox'],
+                    'log.LogEnabled' => '' // empty string means disabled
+                ];
+                $configManager->addConfigs($iniConfig);
 
                 return new ApiContext($credential);
             };
