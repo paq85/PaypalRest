@@ -49,6 +49,8 @@ class PaypalRestGatewayFactory extends GatewayFactory
                 }
 
                 $credential = new OAuthTokenCredential($config['client_id'], $config['client_secret']);
+                \PayPal\Common\PayPalModel::setCredential($credential);
+
                 return new ApiContext($credential);
             };
         }
