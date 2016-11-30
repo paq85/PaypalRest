@@ -48,7 +48,7 @@ class PaypalRestGatewayFactory extends GatewayFactory
                 $iniConfig = [
                     'http.ConnectionTimeOut' => 30,
                     'http.Retry' => 1,
-                    'mode' => $config['sandbox'],
+                    'mode' => $config['mode'],
                     'log.LogEnabled' => '' // empty string means disabled
                 ];
                 $configManager->addConfigs($iniConfig);
